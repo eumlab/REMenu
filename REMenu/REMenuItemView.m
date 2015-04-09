@@ -200,6 +200,23 @@
     self.subtitleLabel.textColor = self.item.subtitleTextColor == nil ? self.menu.subtitleTextColor : self.item.subtitleTextColor;
     self.subtitleLabel.shadowColor = self.item.subtitleTextShadowColor == nil ? self.menu.subtitleTextShadowColor : self.item.subtitleTextShadowColor;
     self.subtitleLabel.shadowOffset = self.item.subtitleTextShadowOffset.width == 0 && self.item.subtitleTextShadowOffset.height == 0 ? self.menu.subtitleTextShadowOffset : self.item.subtitleTextShadowOffset;
+    
+    if (!self.menu.closeOnSelection) {
+        if (self.item.action)
+            self.item.action(self.item);
+    } else {
+        if (self.item.action) {
+            if (self.menu.waitUntilAnimationIsComplete) {
+                __typeof (&*self) __weak weakSelf = self;
+                [self.menu closeWithCompletion:^{
+                    weakSelf.item.action(weakSelf.item);
+                }];
+            } else {
+                [self.menu close];
+                self.item.action(self.item);
+            }
+        }
+    }
 }
 
 - (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event
